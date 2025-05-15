@@ -462,7 +462,7 @@
       stimulus: `
         <h2 style="text-align:center; margin-top:10px;">Instructional Video</h2>
         <div style="width:100%; max-width:1200px; margin:0 auto; text-align:center;">
-          <video id="demo-video" class="no-progress" style="width:100%; height:auto; margin-top:10px;" controls>
+          <video id="demo-video" style="width:100%; height:auto; margin-top:10px;" controls>
             <source src="data/Demo Video.mp4" type="video/mp4">
             Your browser does not support the video tag.
           </video>
@@ -492,7 +492,7 @@
         // When the video ends, enable button and reveal progress bar
         videoElement.addEventListener('ended', function() {
           firstPlay = false;
-          videoElement.classList.remove('no-progress'); // show timeline
+          //videoElement.classList.remove('no-progress'); // show timeline
           // Calculate watch time in seconds
           demoVideoWatchTime = (Date.now() - demoVideoStartTime) / 1000;
           btn.disabled = false; // enable after video finishes
