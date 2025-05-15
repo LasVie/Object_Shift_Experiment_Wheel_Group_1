@@ -464,6 +464,7 @@ var demoVideoTrial = {
     <div style="max-width:1200px; margin:0 auto; text-align:center;">
       <video id="demo-video" controls style="width:100%; height:auto; margin-top:10px;">
         <source src="data/Demo Video.mp4" type="video/mp4">
+        Your browser does not support the video tag.
       </video>
     </div>
     <p style="margin-top:20px; text-align:center;">
@@ -472,21 +473,44 @@ var demoVideoTrial = {
   `,
   choices: ['Continue'],
   on_load: function() {
-    // 1) Enable the button right away
     const btn = document.querySelector('.jspsych-btn');
-    btn.disabled = false;
+    btn.disabled = false;    // immediate enable
 
-    // 2) (Optional) still record how long they watch
-    demoVideoStartTime = Date.now();
-    const videoElement = document.getElementById('demo-video');
-    videoElement.addEventListener('ended', () => {
-      demoVideoWatchTime = (Date.now() - demoVideoStartTime) / 1000;
+    const video = document.getElementById('demo-video');
+    let playStart = null;
+    demoVideoWatchTime = 0;  // reset accumulator
+
+    // When video starts or resumes playing
+    video.addEventListener('play', () => {
+      // record when this play segment began
+      playStart = Date.now();
     });
 
-    // 3) **NO** seeking event listener at all
+    // When video is paused or user seeks
+    function accumulate() {
+      if (playStart !== null) {
+        // add the elapsed seconds since playStart
+        demoVideoWatchTime += (Date.now() - playStart) / 1000;
+        playStart = null;
+      }
+    }
+    video.addEventListener('pause', accumulate);
+    video.addEventListener('seeking', accumulate);
+
+    // When video ends naturally
+    video.addEventListener('ended', () => {
+      accumulate();         // add the last segment
+      // demoVideoWatchTime now holds total watched seconds
+      console.log('Total watched (s):', demoVideoWatchTime);
+    });
+
+    // Also catch the Continue click if they skip before ending
+    btn.addEventListener('click', () => {
+      accumulate();         // add any current segment
+      console.log('Final watched (s):', demoVideoWatchTime);
+    });
   }
 };
-
   </script>
 
   <script>
