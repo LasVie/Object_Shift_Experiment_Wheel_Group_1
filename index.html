@@ -144,15 +144,15 @@
 
     /* -------- NEW: Hide seek bar on first play -------- */
     /* Chromium / Edge / Safari */
-/*     video.no-progress::-webkit-media-controls-timeline,
+    video.no-progress::-webkit-media-controls-timeline,
     video.no-progress::-webkit-media-controls-current-time-display,
     video.no-progress::-webkit-media-controls-time-remaining-display {
       display: none !important;
-    } */
+    }
     /* Firefox */
-/*     video.no-progress::-moz-range-track {
+    video.no-progress::-moz-range-track {
       visibility: hidden !important;
-    } */
+    }
   </style>
 
   <!-- -----------------------------------------------------------
@@ -457,48 +457,36 @@
 
   <script>
     /*************** 2.5) Demo Video Page ***************/
-    var demoVideoTrial = {
-      type: jsPsychHtmlButtonResponse,
-      stimulus: `
-        <h2 style="text-align:center; margin-top:10px;">Instructional Video</h2>
-        <div style="width:100%; max-width:1200px; margin:0 auto; text-align:center;">
-          <video id="demo-video" controls style="width:100%; height:auto; margin-top:10px;">
-            <source src="data/Demo Video.mp4" type="video/mp4">
-            Your browser does not support the video tag.
-          </video>
-        </div>
-        <p style="margin-top:20px; text-align:center;">
-          Please watch this video carefully. The "Continue" button will become available only after the video ends.
-        </p>
-      `,
-      choices: ['Continue'],
-      on_load: function() {
-        const btn = document.querySelector('.jspsych-btn');
-        btn.disabled = false; // initially disabled
+var demoVideoTrial = {
+  type: jsPsychHtmlButtonResponse,
+  stimulus: `
+    <h2 style="text-align:center; margin-top:10px;">Instructional Video</h2>
+    <div style="max-width:1200px; margin:0 auto; text-align:center;">
+      <video id="demo-video" controls style="width:100%; height:auto; margin-top:10px;">
+        <source src="data/Demo Video.mp4" type="video/mp4">
+      </video>
+    </div>
+    <p style="margin-top:20px; text-align:center;">
+      You can skip ahead or scrub through the video at any time.
+    </p>
+  `,
+  choices: ['Continue'],
+  on_load: function() {
+    // 1) Enable the button right away
+    const btn = document.querySelector('.jspsych-btn');
+    btn.disabled = false;
 
-        // Record start time for the video
-        demoVideoStartTime = Date.now();
+    // 2) (Optional) still record how long they watch
+    demoVideoStartTime = Date.now();
+    const videoElement = document.getElementById('demo-video');
+    videoElement.addEventListener('ended', () => {
+      demoVideoWatchTime = (Date.now() - demoVideoStartTime) / 1000;
+    });
 
-        const videoElement = document.getElementById('demo-video');
+    // 3) **NO** seeking event listener at all
+  }
+};
 
-        // Block seeking during first play
-        let firstPlay = true;
-        videoElement.addEventListener('seeking', () => {
-          if (firstPlay) {
-            videoElement.currentTime = 0;
-          }
-        });
-
-        // When the video ends, enable button and reveal progress bar
-        videoElement.addEventListener('ended', function() {
-          firstPlay = false;
-          //videoElement.classList.remove('no-progress'); // show timeline
-          // Calculate watch time in seconds
-          demoVideoWatchTime = (Date.now() - demoVideoStartTime) / 1000;
-          btn.disabled = false; // enable after video finishes
-        });
-      }
-    };
   </script>
 
   <script>
